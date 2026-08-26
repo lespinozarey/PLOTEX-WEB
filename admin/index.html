@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel Admin | PLOTEX Temuco</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { background: var(--bg); }
+
+  /* ---- Login ---- */
+  .admin-login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .admin-login-card {
+    max-width: 400px; width: 100%;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: 40px 32px;
+    box-shadow: var(--shadow-lg); text-align: center;
+  }
+  .admin-login-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 12px; display: block; }
+  .admin-login-card h1 { font-family: var(--font-serif); font-size: 1.7rem; margin-bottom: 6px; }
+  .admin-login-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+  .admin-login-card input {
+    width: 100%; padding: 13px 16px; border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-md); background: var(--bg-2); color: var(--text);
+    font-family: var(--font-mono); font-size: 0.95rem; margin-bottom: 14px; outline: none; box-sizing: border-box;
+  }
+  .admin-login-card input:focus { border-color: var(--orange); }
+  .admin-login-error { color: var(--orange-2); font-size: 0.82rem; margin-top: 12px; display: none; }
+
+  /* ---- Layout general ---- */
+  #adminApp { display: none; max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+  .admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+  .admin-topbar h1 { font-family: var(--font-serif); font-size: 1.7rem; margin: 0; }
+  .admin-topbar h1 em { font-style: italic; color: var(--primary); }
+  .admin-logout { font-size: 0.82rem; color: var(--text-muted); background: none; border: 1px solid var(--border-strong); border-radius: var(--r-full); padding: 8px 16px; cursor: pointer; }
+  .admin-logout:hover { border-color: var(--orange); color: var(--orange); }
+
+  .admin-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin-bottom: 24px; overflow-x: auto; }
+  .admin-tab {
+    padding: 10px 18px; font-size: 0.88rem; font-weight: 500; color: var(--text-muted);
+    background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+  }
+  .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .admin-panel { display: none; }
+  .admin-panel.active { display: block; }
+
+  .admin-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+  .admin-toolbar .count { font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono); }
+  .admin-refresh { font-size: 0.82rem; color: var(--text-muted); background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-full); padding: 7px 14px; cursor: pointer; }
+  .admin-refresh:hover { border-color: var(--orange); color: var(--orange); }
+
+  .admin-table-wrap { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+  table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  table.admin-table th {
+    text-align: left; padding: 12px 16px; background: var(--bg-2); color: var(--text-muted);
+    font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border);
+  }
+  table.admin-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.admin-table tr:last-child td { border-bottom: none; }
+  table.admin-table tr:hover td { background: var(--bg-2); }
+  .cell-mono { font-family: var(--font-mono); font-size: 0.82rem; }
+  .cell-total { color: var(--primary); font-weight: 600; font-family: var(--font-mono); }
+  .cell-muted { color: var(--text-muted); font-size: 0.8rem; }
+  .cell-file-link { color: var(--primary); font-size: 0.82rem; display: inline-flex; align-items: center; gap: 4px; }
+  .cell-file-link:hover { text-decoration: underline; }
+  .no-file { color: var(--text-muted); font-size: 0.8rem; }
+
+  .badge { display: inline-block; padding: 4px 10px; border-radius: var(--r-full); font-size: 0.72rem; font-weight: 600; font-family: var(--font-mono); }
+  .badge-RECIBIDO { background: rgba(160,160,171,0.15); color: var(--text-muted); }
+  .badge-EN_PREPARACION { background: rgba(255,139,92,0.15); color: var(--orange-3); }
+  .badge-PLOTTEANDO { background: rgba(255,107,53,0.15); color: var(--orange); }
+  .badge-EN_REPARTO { background: rgba(224,78,27,0.15); color: var(--orange-2); }
+  .badge-ENTREGADO { background: rgba(80,180,120,0.15); color: #3F9F63; }
+  .badge-CANCELADO { background: rgba(224,78,27,0.15); color: var(--orange-2); }
+
+  .estado-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .estado-row select, .estado-row input {
+    padding: 6px 10px; border: 1.5px solid var(--border-strong); border-radius: var(--r-sm);
+    background: var(--bg-2); color: var(--text); font-size: 0.78rem; font-family: var(--font-sans);
+  }
+  .estado-row button {
+    padding: 6px 12px; border-radius: var(--r-full); border: none; background: var(--ink); color: white;
+    font-size: 0.78rem; cursor: pointer;
+  }
+  .estado-row button:hover { background: var(--ink-2); }
+  .estado-row button:disabled { opacity: 0.5; cursor: wait; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-state i { font-size: 2rem; opacity: 0.4; display: block; margin-bottom: 12px; }
+
+  /* ---- Precios ---- */
+  .precios-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px; }
+  .precios-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 22px; box-shadow: var(--shadow-sm); }
+  .precios-card h3 { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 0 0 16px; }
+  .precio-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .precio-row label { font-size: 0.9rem; font-weight: 500; min-width: 90px; }
+  .precio-row .prefix { font-size: 0.85rem; color: var(--text-muted); }
+  .precio-row input {
+    width: 120px; padding: 9px 12px; border: 1.5px solid var(--border-strong); border-radius: var(--r-sm);
+    background: var(--bg-2); color: var(--text); font-family: var(--font-mono); font-size: 0.9rem; text-align: right;
+  }
+  .precio-row input:focus { border-color: var(--orange); outline: none; }
+
+  .descuentos-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .descuento-item { display: flex; align-items: center; gap: 8px; }
+  .descuento-item span { font-size: 0.85rem; color: var(--text-muted); }
+  .descuento-item input { width: 70px; padding: 8px 10px; border: 1.5px solid var(--border-strong); border-radius: var(--r-sm); background: var(--bg-2); color: var(--text); font-family: var(--font-mono); font-size: 0.85rem; text-align: center; }
+  .descuento-item button { background: none; border: none; color: var(--orange-2); cursor: pointer; font-size: 1rem; padding: 4px; }
+  .btn-add-descuento { font-size: 0.8rem; color: var(--primary); background: none; border: 1px dashed var(--border-strong); border-radius: var(--r-sm); padding: 8px 14px; cursor: pointer; width: 100%; }
+  .btn-add-descuento:hover { border-color: var(--orange); }
+
+  .admin-save-bar { display: flex; align-items: center; gap: 14px; justify-content: flex-end; }
+  .admin-save-msg { font-size: 0.85rem; }
+  .admin-save-msg.ok { color: #3F9F63; }
+  .admin-save-msg.err { color: var(--orange-2); }
+  .btn-save {
+    background: var(--ink); color: white; border: none; border-radius: var(--r-full);
+    padding: 12px 26px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .btn-save:hover { background: var(--ink-2); }
+  .btn-save:disabled { opacity: 0.6; cursor: wait; }
+
+  @media (max-width: 700px) {
+    .admin-table-wrap { overflow-x: auto; }
+    table.admin-table { min-width: 640px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="admin-login-wrap" id="loginWrap">
+    <div class="admin-login-card">
+      <i class="bi bi-shield-lock"></i>
+      <h1>Panel <em style="font-style:italic;color:var(--primary)">Admin</em></h1>
+      <p>Ingresa tus credenciales de administrador para continuar.</p>
+      <form id="loginForm">
+        <input type="text" id="adminUserVal" placeholder="Usuario" autocomplete="username" />
+        <input type="password" id="adminPassVal" placeholder="Contraseña" autocomplete="current-password" />
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+      </form>
+      <div class="admin-login-error" id="loginError">Credenciales incorrectas o servidor no disponible.</div>
+    </div>
+  </div>
+
+
+  <!-- ============ APP ============ -->
+  <div id="adminApp">
+    <div class="admin-topbar">
+      <h1>PLOTEX <em>Admin</em></h1>
+      <button class="admin-logout" id="btnLogout"><i class="bi bi-box-arrow-right"></i> Salir</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="cotizaciones">Cotizaciones</button>
+      <button class="admin-tab" data-tab="pedidos">Pedidos / Tracking</button>
+      <button class="admin-tab" data-tab="precios">Precios y servicios</button>
+      <button class="admin-tab" data-tab="instagram"><i class="bi bi-instagram"></i> Feed Instagram</button>
+    </div>
+
+    <!-- ---- TAB: Cotizaciones ---- -->
+    <div class="admin-panel active" id="panel-cotizaciones">
+      <div class="admin-toolbar">
+        <span class="count" id="cotCount">—</span>
+        <button class="admin-refresh" onclick="cargarCotizaciones()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="cotTable">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Contacto</th>
+              <th>Cotizacion</th>
+              <th>Total</th>
+              <th>Archivo</th>
+              <th>Mensaje</th>
+            </tr>
+          </thead>
+          <tbody id="cotBody"></tbody>
+        </table>
+        <div class="empty-state" id="cotEmpty" hidden><i class="bi bi-inbox"></i>Aun no hay cotizaciones.</div>
+      </div>
+    </div>
+
+    <!-- ---- TAB: Pedidos / Tracking ---- -->
+    <div class="admin-panel" id="panel-pedidos">
+      <div class="admin-toolbar">
+        <span class="count" id="pedCount">—</span>
+        <button class="admin-refresh" onclick="cargarPedidos()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="pedTable">
+          <thead>
+            <tr>
+              <th>Tracking</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Actualizar estado</th>
+            </tr>
+          </thead>
+          <tbody id="pedBody"></tbody>
+        </table>
+        <div class="empty-state" id="pedEmpty" hidden><i class="bi bi-box-seam"></i>Aun no hay pedidos.</div>
+      </div>
+    </div>
+
+    <!-- ---- TAB: Precios y servicios ---- -->
+    <div class="admin-panel" id="panel-precios">
+      <div class="precios-grid">
+        <div class="precios-card">
+          <h3>Precio base por formato</h3>
+          <div id="precioBaseFields"></div>
+        </div>
+        <div class="precios-card">
+          <h3>Multiplicador por tipo de trazo</h3>
+          <div id="multiplicadorFields"></div>
+        </div>
+        <div class="precios-card">
+          <h3>Descuentos por volumen</h3>
+          <div class="descuentos-list" id="descuentosList"></div>
+          <button class="btn-add-descuento" id="btnAddDescuento">+ Agregar tramo de descuento</button>
+        </div>
+        <div class="precios-card">
+          <h3>Despacho / Reparto</h3>
+          <div class="precio-row">
+            <label>Costo Temuco</label>
+            <div><span class="prefix">$</span> <input type="number" id="costoReparto" min="0" step="500" /></div>
+          </div>
+          <div class="precio-row">
+            <label>Gratis desde</label>
+            <div><input type="number" id="repartoGratisDesde" min="1" step="1" /> <span class="prefix">und.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-save-bar">
+        <span class="admin-save-msg" id="preciosMsg"></span>
+        <button class="btn-save" id="btnGuardarPrecios">Guardar cambios</button>
+      </div>
+    </div>
+
+    <!-- ---- TAB: Feed Instagram ---- -->
+    <div class="admin-panel" id="panel-instagram">
+      <div class="precios-grid" style="grid-template-columns: 1fr; margin-bottom:20px;">
+        <div class="precios-card">
+          <h3>Sincronización Automática con Instagram Graph API</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+            Conecta tu cuenta de <strong>@plotextemuco</strong> ingresando un <em>Instagram User Access Token</em> de Meta for Developers para descargar automáticamente las últimas fotos y descripciones publicadas.
+          </p>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <input type="password" id="igAccessToken" placeholder="Pega aquí tu Instagram Access Token" style="flex:1; min-width:240px; padding:10px 14px; border:1.5px solid var(--border-strong); border-radius:var(--r-sm); background:var(--bg-2); color:var(--text); font-family:var(--font-mono); font-size:0.85rem;" />
+            <button class="btn-save" id="btnSyncIg" style="background:#E1306C; padding:10px 18px; font-size:0.85rem;">
+              <i class="bi bi-arrow-repeat"></i> Sincronizar Ahora
+            </button>
+          </div>
+          <div id="igSyncStatus" style="font-size:0.8rem; margin-top:8px; color:var(--text-muted);"></div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--font-mono); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin:24px 0 12px;">
+        Publicaciones Activas en la Web (4 Destacados)
+      </h3>
+      <div class="precios-grid" id="igPostsEditorGrid">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+      <div class="admin-save-bar" style="margin-top:20px;">
+        <span class="admin-save-msg" id="igSaveMsg"></span>
+        <button class="btn-save" id="btnGuardarIg">Guardar Publicaciones</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const API_ROOT = "http://localhost:3000/api";
+  const savedTheme = localStorage.getItem("plotex-theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  const loginWrap = document.getElementById("loginWrap");
+  const adminApp = document.getElementById("adminApp");
+  const loginForm = document.getElementById("loginForm");
+  const adminUserVal = document.getElementById("adminUserVal");
+  const adminPassVal = document.getElementById("adminPassVal");
+  const loginError = document.getElementById("loginError");
+
+  const fmt = (n) => "$" + Math.round(Number(n) || 0).toLocaleString("es-CL");
+  const fmtFecha = (iso) => {
+    try {
+      return new Date(iso).toLocaleString("es-CL", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    } catch { return iso || "—"; }
+  };
+
+  function escapeHtml(str) {
+    if (str == null) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  async function adminFetch(path, opts = {}) {
+    const res = await fetch(`${API_ROOT}${path}`, {
+      ...opts,
+      credentials: "include",
+      headers: { ...(opts.headers || {}) },
+    });
+    if (res.status === 401) {
+      mostrarLogin("Sesion expirada. Inicia sesion nuevamente.");
+      throw new Error("No autorizado");
+    }
+    return res;
+  }
+
+  function mostrarLogin(msg) {
+    loginWrap.style.display = "flex";
+    adminApp.style.display = "none";
+    if (msg) {
+      loginError.textContent = msg;
+      loginError.style.display = "block";
+    }
+  }
+
+  function mostrarApp() {
+    loginWrap.style.display = "none";
+    adminApp.style.display = "block";
+    cargarCotizaciones();
+    cargarPedidos();
+    cargarPrecios();
+    cargarInstagramAdmin();
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    loginError.style.display = "none";
+    const usuario = adminUserVal.value.trim();
+    const password = adminPassVal.value.trim();
+    if (!usuario || !password) return;
+
+    try {
+      const res = await fetch(`${API_ROOT}/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ usuario, password }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        loginError.textContent = data.error || "Credenciales incorrectas.";
+        loginError.style.display = "block";
+        return;
+      }
+      mostrarApp();
+    } catch (err) {
+      loginError.textContent = "No pudimos conectar con el servidor.";
+      loginError.style.display = "block";
+    }
+  });
+
+  document.getElementById("btnLogout").addEventListener("click", async () => {
+    try {
+      await fetch(`${API_ROOT}/admin/logout`, { method: "POST", credentials: "include" });
+    } catch {}
+    mostrarLogin();
+  });
+
+  // Validar sesion al cargar la pagina
+  async function checkSession() {
+    try {
+      const res = await fetch(`${API_ROOT}/admin/me`, { credentials: "include" });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        mostrarApp();
+      } else {
+        mostrarLogin();
+      }
+    } catch {
+      mostrarLogin();
+    }
+  }
+  checkSession();
+
+
+  /* ====== Tabs ====== */
+  document.querySelectorAll(".admin-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".admin-tab").forEach((t) => t.classList.remove("active"));
+      document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(`panel-${tab.dataset.tab}`).classList.add("active");
+    });
+  });
+
+  /* ====== Cotizaciones ====== */
+  window.cargarCotizaciones = async function () {
+    const tbody = document.getElementById("cotBody");
+    const empty = document.getElementById("cotEmpty");
+    try {
+      const res = await adminFetch("/cotizaciones");
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      document.getElementById("cotCount").textContent = `${data.total} cotizacion${data.total === 1 ? "" : "es"}`;
+      empty.hidden = data.cotizaciones.length > 0;
+
+      tbody.innerHTML = data.cotizaciones.map((c) => `
+        <tr>
+          <td class="cell-muted">${escapeHtml(fmtFecha(c.createdAt))}</td>
+          <td>${escapeHtml(c.nombre || "—")}</td>
+          <td class="cell-mono">${escapeHtml(c.email || "")}<br><span class="cell-muted">${escapeHtml(c.telefono || "")}</span></td>
+          <td>${c.calculo ? `${escapeHtml(c.calculo.cantidad)}x ${escapeHtml(c.calculo.formato)} (${escapeHtml(c.calculo.tipo)})` : "—"}</td>
+          <td class="cell-total">${c.calculo ? fmt(c.calculo.total) : "—"}</td>
+          <td>${
+            c.archivo
+              ? `<a class="cell-file-link" href="#" onclick="descargarArchivo(${Number(c.id)});return false;"><i class="bi bi-download"></i> ${escapeHtml(c.archivo.nombre)}</a>`
+              : `<span class="no-file">Sin archivo</span>`
+          }</td>
+          <td class="cell-muted">${escapeHtml(c.mensaje || "—")}</td>
+        </tr>
+      `).join("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  window.descargarArchivo = async function (id) {
+    try {
+      const res = await adminFetch(`/admin/cotizaciones/${encodeURIComponent(id)}/archivo`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "No se pudo descargar el archivo.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("No se pudo descargar el archivo.");
+    }
+  };
+
+  /* ====== Pedidos / Tracking ====== */
+  const ESTADO_LABELS = {
+    RECIBIDO: "Recibido", EN_PREPARACION: "En preparacion", PLOTTEANDO: "Plotteando",
+    EN_REPARTO: "En reparto", ENTREGADO: "Entregado", CANCELADO: "Cancelado",
+  };
+  const ESTADOS_ORDEN = ["RECIBIDO", "EN_PREPARACION", "PLOTTEANDO", "EN_REPARTO", "ENTREGADO", "CANCELADO"];
+
+  window.cargarPedidos = async function () {
+    const tbody = document.getElementById("pedBody");
+    const empty = document.getElementById("pedEmpty");
+    try {
+      const res = await adminFetch("/tracking/admin/all");
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      document.getElementById("pedCount").textContent = `${data.total} pedido${data.total === 1 ? "" : "es"}`;
+      empty.hidden = data.pedidos.length > 0;
+
+      tbody.innerHTML = data.pedidos.map((p) => `
+        <tr>
+          <td class="cell-mono">${escapeHtml(p.tracking)}</td>
+          <td>
+            ${escapeHtml(p.cliente?.nombre || "—")}<br>
+            <span class="cell-muted">${escapeHtml(p.cliente?.telefono || p.cliente?.email || "")}</span>
+            ${p.direccion ? `<br><small style="color:var(--text-muted); font-size:0.75rem;"><i class="bi bi-geo-alt"></i> ${escapeHtml(p.direccion)}${p.envio?.courier ? ' &middot; <b>' + escapeHtml(p.envio.courier) + '</b>' : ''}</small>` : ''}
+          </td>
+          <td class="cell-total">${fmt(p.total)}</td>
+          <td><span class="badge badge-${escapeHtml(p.estado)}">${escapeHtml(ESTADO_LABELS[p.estado] || p.estado)}</span></td>
+          <td>
+            <div class="estado-row">
+              <select id="sel-${escapeHtml(p.tracking)}">
+                ${ESTADOS_ORDEN.map((e) => `<option value="${e}" ${e === p.estado ? "selected" : ""}>${escapeHtml(ESTADO_LABELS[e])}</option>`).join("")}
+              </select>
+              <button onclick="actualizarEstado('${escapeHtml(p.tracking)}', this)">Guardar</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+  window.actualizarEstado = async function (tracking, btn) {
+    const select = document.getElementById(`sel-${tracking}`);
+    const estado = select.value;
+    btn.disabled = true;
+    btn.textContent = "...";
+    try {
+      const res = await adminFetch(`/tracking/${encodeURIComponent(tracking)}/estado`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "No se pudo actualizar");
+      cargarPedidos();
+    } catch (err) {
+      alert(err.message || "No se pudo actualizar el estado.");
+      btn.disabled = false;
+      btn.textContent = "Guardar";
+    }
+  };
+
+  /* ====== Precios y servicios ====== */
+  const FORMATOS = [
+    { code: "A0", label: "A0" }, { code: "A1", label: "A1" }, { code: "A2", label: "A2" },
+    { code: "A3", label: "A3" }, { code: "A4", label: "A4" },
+  ];
+  const TIPOS = [
+    { code: "linea-bn", label: "Linea B/N" }, { code: "linea-color", label: "Linea Color" },
+    { code: "area-bn", label: "Area B/N" }, { code: "area-color", label: "Area Color" },
+  ];
+
+  let descuentosActuales = [];
+
+  function renderDescuentos() {
+    const list = document.getElementById("descuentosList");
+    list.innerHTML = descuentosActuales.map((d, i) => `
+      <div class="descuento-item">
+        <span>Desde</span>
+        <input type="number" min="1" value="${d.min}" data-idx="${i}" data-field="min" class="desc-input" />
+        <span>und. →</span>
+        <input type="number" min="0" max="90" value="${d.pct}" data-idx="${i}" data-field="pct" class="desc-input" />
+        <span>% off</span>
+        <button type="button" onclick="quitarDescuento(${i})" title="Quitar"><i class="bi bi-trash3"></i></button>
+      </div>
+    `).join("");
+
+    list.querySelectorAll(".desc-input").forEach((inp) => {
+      inp.addEventListener("change", () => {
+        const idx = Number(inp.dataset.idx);
+        descuentosActuales[idx][inp.dataset.field] = Number(inp.value);
+      });
+    });
+  }
+
+  window.quitarDescuento = function (idx) {
+    descuentosActuales.splice(idx, 1);
+    renderDescuentos();
+  };
+
+  document.getElementById("btnAddDescuento").addEventListener("click", () => {
+    descuentosActuales.push({ min: 1, pct: 0 });
+    renderDescuentos();
+  });
+
+  window.cargarPrecios = async function () {
+    try {
+      const res = await adminFetch("/admin/precios");
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      const p = data.precios;
+
+      document.getElementById("precioBaseFields").innerHTML = FORMATOS.map((f) => `
+        <div class="precio-row">
+          <label>${f.label}</label>
+          <div><span class="prefix">$</span> <input type="number" min="0" step="1" id="pb-${f.code}" value="${p.precioBase[f.code] ?? 0}" /></div>
+        </div>
+      `).join("");
+
+      document.getElementById("multiplicadorFields").innerHTML = TIPOS.map((t) => `
+        <div class="precio-row">
+          <label>${t.label}</label>
+          <div><input type="number" min="0.1" step="0.1" id="mu-${t.code}" value="${p.multiplicador[t.code] ?? 1}" style="width:80px" /> <span class="prefix">x</span></div>
+        </div>
+      `).join("");
+
+      descuentosActuales = (p.descuentos || []).map((d) => ({ ...d }));
+      renderDescuentos();
+
+      document.getElementById("costoReparto").value = p.costoReparto ?? 0;
+      document.getElementById("repartoGratisDesde").value = p.repartoGratisDesde ?? 1;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  document.getElementById("btnGuardarPrecios").addEventListener("click", async () => {
+    const btn = document.getElementById("btnGuardarPrecios");
+    const msg = document.getElementById("preciosMsg");
+    msg.textContent = "";
+    msg.className = "admin-save-msg";
+    btn.disabled = true;
+    btn.textContent = "Guardando...";
+
+    const precioBase = {};
+    FORMATOS.forEach((f) => { precioBase[f.code] = Number(document.getElementById(`pb-${f.code}`).value); });
+
+    const multiplicador = {};
+    TIPOS.forEach((t) => { multiplicador[t.code] = Number(document.getElementById(`mu-${t.code}`).value); });
+
+    const body = {
+      precioBase,
+      multiplicador,
+      descuentos: descuentosActuales,
+      costoReparto: Number(document.getElementById("costoReparto").value),
+      repartoGratisDesde: Number(document.getElementById("repartoGratisDesde").value),
+    };
+
+    try {
+      const res = await adminFetch("/admin/precios", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "No se pudo guardar");
+      msg.textContent = "Cambios guardados. Ya aplican en el cotizador.";
+      msg.classList.add("ok");
+      cargarPrecios();
+    } catch (err) {
+      msg.textContent = err.message || "No se pudo guardar.";
+      msg.classList.add("err");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Guardar cambios";
+    }
+  });
+
+  /* ====== Instagram Feed Admin ====== */
+  let igPostsActuales = [];
+
+  window.cargarInstagramAdmin = async function () {
+    const grid = document.getElementById("igPostsEditorGrid");
+    const status = document.getElementById("igSyncStatus");
+    try {
+      const res = await adminFetch("/instagram/feed");
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      if (data.lastSync) {
+        status.innerHTML = `Última sincronización: <b>${fmtFecha(data.lastSync)}</b> &middot; @${escapeHtml(data.username)}`;
+      } else {
+        status.innerHTML = `Estado: Sin sincronización previa (usando destacados locales).`;
+      }
+
+      igPostsActuales = data.posts || [];
+      grid.innerHTML = igPostsActuales.map((p, idx) => `
+        <div class="precios-card" style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0; font-size:0.85rem; font-family:var(--font-mono); color:var(--primary);">Post #${idx + 1}</h4>
+            <span class="badge badge-EN_PREPARACION" style="font-size:0.65rem;">${escapeHtml(p.badge || 'PLOTEX')}</span>
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Etiqueta / Badge:</label>
+            <input type="text" id="ig-badge-${idx}" value="${escapeHtml(p.badge || '')}" style="width:100%; padding:6px 10px; font-size:0.82rem; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text);" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Título de la publicación:</label>
+            <input type="text" id="ig-title-${idx}" value="${escapeHtml(p.title || '')}" style="width:100%; padding:6px 10px; font-size:0.82rem; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text);" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Descripción / Caption:</label>
+            <textarea id="ig-desc-${idx}" rows="2" style="width:100%; padding:6px 10px; font-size:0.8rem; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text); font-family:var(--font-sans); resize:vertical;">${escapeHtml(p.description || '')}</textarea>
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Ruta / URL de la imagen:</label>
+            <input type="text" id="ig-img-${idx}" value="${escapeHtml(p.imageUrl || '')}" style="width:100%; padding:6px 10px; font-size:0.8rem; font-family:var(--font-mono); background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text);" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Enlace Instagram (Permalink):</label>
+            <input type="text" id="ig-link-${idx}" value="${escapeHtml(p.permalink || 'https://instagram.com/plotextemuco')}" style="width:100%; padding:6px 10px; font-size:0.8rem; font-family:var(--font-mono); background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text);" />
+          </div>
+        </div>
+      `).join("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Sincronizar con Instagram Graph API
+  const btnSyncIg = document.getElementById("btnSyncIg");
+  if (btnSyncIg) {
+    btnSyncIg.addEventListener("click", async () => {
+      const status = document.getElementById("igSyncStatus");
+      const token = document.getElementById("igAccessToken").value.trim();
+
+      btnSyncIg.disabled = true;
+      btnSyncIg.innerHTML = '<i class="bi bi-arrow-repeat"></i> Sincronizando...';
+      status.textContent = "Conectando con Instagram...";
+
+      try {
+        if (token) {
+          await adminFetch("/instagram/config", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accessToken: token }),
+          });
+        }
+
+        const res = await adminFetch("/instagram/sync", { method: "POST" });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "No se pudo sincronizar");
+
+        status.innerHTML = `<span style="color:#3F9F63;">✓ ${data.mensaje}</span> (${fmtFecha(data.lastSync)})`;
+        cargarInstagramAdmin();
+      } catch (err) {
+        status.innerHTML = `<span style="color:var(--orange-2);">✗ ${err.message}</span>`;
+      } finally {
+        btnSyncIg.disabled = false;
+        btnSyncIg.innerHTML = '<i class="bi bi-arrow-repeat"></i> Sincronizar Ahora';
+      }
+    });
+  }
+
+  // Guardar publicaciones manualmente
+  const btnGuardarIg = document.getElementById("btnGuardarIg");
+  if (btnGuardarIg) {
+    btnGuardarIg.addEventListener("click", async () => {
+      const msg = document.getElementById("igSaveMsg");
+      msg.textContent = "";
+      msg.className = "admin-save-msg";
+      btnGuardarIg.disabled = true;
+      btnGuardarIg.textContent = "Guardando...";
+
+      const posts = igPostsActuales.map((_, idx) => ({
+        badge: document.getElementById(`ig-badge-${idx}`)?.value || "PLOTEX",
+        title: document.getElementById(`ig-title-${idx}`)?.value || "Ploteo Técnico",
+        description: document.getElementById(`ig-desc-${idx}`)?.value || "",
+        imageUrl: document.getElementById(`ig-img-${idx}`)?.value || "assets/ig-post-1.jpg",
+        permalink: document.getElementById(`ig-link-${idx}`)?.value || "https://instagram.com/plotextemuco",
+      }));
+
+      try {
+        const res = await adminFetch("/instagram/config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ posts }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "Error al guardar");
+
+        msg.textContent = "¡Publicaciones guardadas y actualizadas en la web!";
+        msg.classList.add("ok");
+        cargarInstagramAdmin();
+      } catch (err) {
+        msg.textContent = err.message || "Error al guardar publicaciones.";
+        msg.classList.add("err");
+      } finally {
+        btnGuardarIg.disabled = false;
+        btnGuardarIg.textContent = "Guardar Publicaciones";
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

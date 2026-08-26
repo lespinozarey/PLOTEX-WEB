@@ -1,0 +1,77 @@
+# PLOTEX Temuco - Documentación Técnica Completa para Modelos de Lenguaje (LLMs)
+
+> Documentación de referencia técnica integral de PLOTEX Temuco para modelos de inteligencia artificial, buscadores generativos y agentes autónomos.
+
+## Información de la Entidad
+
+- **Nombre Comercial**: PLOTEX Temuco
+- **Giro**: Taller Técnico de Ploteo, Impresión de Gran Formato y Gráfica Publicitaria
+- **Ubicación Física**: Sector Fundo El Carmen, Temuco, Región de La Araucanía, Chile
+- **Horario de Taller**: Lunes a Viernes de 09:00 a 19:00 hrs
+- **Contacto WhatsApp**: +56 9 6639 0787 (https://wa.me/56966390787)
+- **Correo Electrónico**: plotextemuco@gmail.com
+- **Instagram**: @plotextemuco (https://instagram.com/plotextemuco)
+
+---
+
+## Catálogo Técnico de Servicios y Tarifas
+
+### 1. Ploteo de Planos CAD / BIM (Arquitectura e Ingeniería)
+- **URL**: https://plotextemuco.cl/index.html
+- **Fidelidad**: 1:1 vectorial exacta, sin autoajuste, grosor mínimo de línea 0.02 mm.
+- **Sustratos**:
+  - Bond 80g: Papel blanco técnico de alta blancura.
+  - Foto Glossy 180g (A3): Papel fotográfico brillante de alto gramaje, fijado a formato A3 por **$5.000 CLP**.
+- **Tarifas Base Planos Bond 80g**:
+  - A4 (210×297 mm): $800 B/N | $1.200 Color
+  - A3 (297×420 mm): $1.200 B/N | $2.000 Color
+  - A2 (420×594 mm): $1.900 B/N | $3.000 Color
+  - A1 (594×841 mm) [Estándar]: $2.500 B/N | $4.200 Color
+  - A0 (841×1189 mm): $4.800 B/N | $7.800 Color
+  - Rollo Continuo / Personalizado: $4.500/m² B/N | $7.500/m² Color
+- **Servicios Adicionales**:
+  - Plegado Normalizado NCh (Norma Chilena de Dibujo Arquitectónico): $300 por lámina.
+  - Descuentos por volumen: 10% (10-19 láminas), 20% (20-49 láminas), 30% (50+ láminas).
+
+### 2. Pósters Científicos para Congresos y Seminarios
+- **URL**: https://plotextemuco.cl/posters-cientificos.html
+- **Aplicación**: Congresos médicos, jornadas científicas universitarias, exposiciones y tesis de postgrado.
+- **Sustrato**: Papel Sintético Matte 180g antirreflejo, resistente al desgarro y a la manipulación.
+- **Tarifas**:
+  - Formato Oficial 90×120 cm: **$14.900 CLP**
+  - Formato A0 (84.1×118.9 cm): **$13.900 CLP**
+  - Formato A1 (59.4×84.1 cm): **$9.900 CLP**
+- **Accesorios**: Tubo Portapóster Rígido de viaje con tapa hermética y correa de transporte ajustable: **$4.500 CLP**.
+
+### 3. Letreros de Obra MOP / SERVIU
+- **URL**: https://plotextemuco.cl/letreros-obra.html
+- **Normativa**: Cumple con el Manual de Señalización de Obras del MOP y SERVIU de Chile.
+- **Estructura**: Placa de Zinc-Alum 0.5 mm montada sobre bastidor estructural de madera o metal.
+- **Gráfica**: Vinilo reflectante grado ingeniería o vinilo adhesivo laminado con protección UV para intemperie.
+- **Formatos y Precios**:
+  - Letrero 2.0 × 1.0 m: **$75.000 CLP**
+  - Letrero 3.0 × 2.0 m: **$180.000 CLP**
+
+### 4. Impresión de Lona PVC Publicitaria
+- **URL**: https://plotextemuco.cl/lona-pvc.html
+- **Variantes**:
+  - Frontlit 13oz estándar: **$9.500 CLP / m²**
+  - Mesh Microperforada (antiviento para fachadas y andamios): **$11.500 CLP / m²**
+  - Blackout opaca (doble cara o bloqueo de luz): **$13.500 CLP / m²**
+- **Confección**: Incluye ojetillos metálicos perimetrales cada 50 cm y vainas reforzadas para tubos o tensores.
+
+---
+
+## Políticas de Despacho y Entrega
+
+1. **Retiro en Taller**: $0 CLP (Gratis) en Sector Fundo El Carmen, Temuco.
+2. **Despacho Local Temuco**: $3.500 CLP en el radio urbano de Temuco. **100% GRATIS** para compras desde $20.000 CLP.
+3. **Envíos a Todo Chile**: Modalidad encomienda por pagar mediante Starken, Blue Express o Chilexpress.
+
+---
+
+## Medios de Pago y Facturación
+
+- **Pasarela Online**: Webpay Plus (Transbank) compatible con tarjetas de débito (Redcompra), crédito y prepago.
+- **Documentación**: Boleta o Factura Electrónica emitida con validación oficial de RUT ante el SII.
+- **Presupuesto Proforma**: Generación instantánea en PDF con desglose financiero de Neto, IVA 19% y Flete.

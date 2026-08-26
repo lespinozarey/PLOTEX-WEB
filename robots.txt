@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://plotex.cl/sitemap.xml
+# LLM Indexing Reference
+# https://plotex.cl/llms.txt
+# https://plotex.cl/llms-full.txt
