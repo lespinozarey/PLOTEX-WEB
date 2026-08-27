@@ -3,7 +3,7 @@
  * Cache-First Architecture for Zero-FOUC & Instant Reloads
  */
 
-const CACHE_NAME = "plotex-v5-cache";
+const CACHE_NAME = "plotex-v7-cache";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   "./styles.css",
   "./script.js",
   "./assets/plotter-studio.jpg",
+  "./assets/blueprint-detail.jpg",
   "./assets/poster-congress-expo.jpg",
   "./assets/poster-presentation.jpg",
   "./assets/letrero-mop-faena.jpg",
